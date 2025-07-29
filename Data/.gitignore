@@ -3,23 +3,9 @@ FLicker8k_Dataset
 # Ignorar entorno virtual
 venv/
 
-# Ignorar archivos compilados de Python
-__pycache__/
-*.py[cod]
-*.pyo
-
-# Ignorar archivos de configuración de Jupyter
-.ipynb_checkpoints/
-
 # Ignorar archivos temporales de VSCode o sistema
 .DS_Store
 *.swp
 *.swo
 Thumbs.db
 desktop.ini
-
-# Archivos de embeddings y modelos (si no quieres subirlos)
-*.npy
-*.pt
-*.index
-*.pkl
