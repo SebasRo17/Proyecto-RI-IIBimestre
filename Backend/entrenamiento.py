@@ -43,6 +43,12 @@ def get_image_embedding(image_path):
         image_emb = model.get_image_features(**inputs)
     return image_emb.cpu().numpy().flatten()
 
+def get_text_embedding(text):
+    inputs = processor(text=[text], return_tensors="pt", padding=True).to(device)
+    with torch.no_grad():
+        text_emb = model.get_text_features(**inputs)
+    return text_emb.cpu().numpy().flatten()
+
 def get_text_embedding_multiple(captions_list):
     embeddings = []
     for text in captions_list:
@@ -74,7 +80,7 @@ for img_name in tqdm(train_images):
 
 #############################################################################################################################
 
-# 📂 Guardamos los resultados
+# Guardamos los resultados
 output_dir = os.path.join(DATA_DIR, "embeddings")
 os.makedirs(output_dir, exist_ok=True)
 
@@ -91,14 +97,17 @@ print("✅ Embeddings generados y guardados.")
 
 import faiss
 
-# 🔢 Convertir embeddings a matriz FAISS
+if len(image_embeddings) == 0:
+    print("❌ No se generaron embeddings. Verifica errores anteriores.")
+    exit()
+
 image_embeddings_np = np.array(image_embeddings).astype("float32")
 
-# 🏗️ Crear índice FAISS plano (L2, también puedes usar cosine)
+# Crear índice FAISS plano (L2, también puedes usar cosine)
 faiss_index = faiss.IndexFlatL2(image_embeddings_np.shape[1])
 faiss_index.add(image_embeddings_np)
 
-# 💾 Guardar índice FAISS
+# Guardar índice FAISS
 faiss.write_index(faiss_index, os.path.join(output_dir, "faiss_index.index"))
 
 print("📦 Índice FAISS guardado correctamente.")
