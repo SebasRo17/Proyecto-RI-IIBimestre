@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 
 export interface ClassificationResult {
   imageName: string; // Solo el nombre de la imagen, por ejemplo: "cat.jpg"
+  caption: string; // Descripción de la imagen, por ejemplo: "Un gato en un jardín"
 }
 
 export const useImageClassification = () => {
@@ -26,8 +27,9 @@ export const useImageClassification = () => {
 
       const data = await response.json();
       if (data.resultados) {
-        setResults(data.resultados.map((imgName: string) => ({
-          imageName: imgName
+        setResults(data.resultados.map((item:any) => ({
+          imageName: item.imageName, 
+          caption: item.caption 
         })));
       } else {
         setError('No se encontraron resultados.');
@@ -56,9 +58,7 @@ export const useImageClassification = () => {
 
       const data = await response.json();
       if (data.resultados) {
-        setResults(data.resultados.map((imgName: string) => ({
-          imageName: imgName
-        })));
+         setResults(data.resultados);
       } else {
         setError('No se encontraron resultados.');
       }

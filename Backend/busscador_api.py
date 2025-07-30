@@ -10,17 +10,10 @@ from io import BytesIO
 from transformers import CLIPModel, CLIPProcessor
 import torch
 
-print("Configurando FastAPI...")
-
-# ================================
-# CONFIGURACIÓN Y CARGA DE MODELOS
-# ================================
-
 app = FastAPI(title="API de Búsqueda de Imágenes")
 
-# ----------- AGREGA ESTO ----------
+# Configuración de CORS para permitir solicitudes desde cualquier origen
 from fastapi.middleware.cors import CORSMiddleware
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # O pon ["http://localhost:5173"] para ser más estricto
@@ -28,9 +21,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# ----------- FIN DE AGREGAR ESTO ----------
 
-device = torch.device("cpu")  # Fuerza a CPU
+
+device = torch.device("cpu")  
 print("Cargando modelo CLIP (CPU)...")
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
@@ -44,21 +37,48 @@ print("Embeddings y FAISS cargados.")
 
 from fastapi.staticfiles import StaticFiles
 
+# Direcion el directorio de imágenes estáticas
 app.mount(
     "/dataset-images",
-    StaticFiles(directory=r"C:\Users\gboy2\OneDrive - Escuela Politécnica Nacional\OCTAVO SEMESTRE\RECUPERACION DE INFORMACION\PROYECTO 2BIM\Flickr8k_Dataset\Flicker8k_Dataset"),
+    StaticFiles(directory=r"D:\Descargas\Flickr8k_Dataset\Flicker8k_Dataset"),
     name="dataset-images"
 )
+
+
+
+# ================================
+# Cargar descripciones de imágenes
+# ================================ 
+def cargar_descripciones(ruta_txt):
+    descripciones = {}
+    with open(ruta_txt, "r", encoding="utf-8") as f:
+        for linea in f:
+            partes = linea.strip().split('\t')
+            if len(partes) != 2:
+                continue
+            nombre_completo, descripcion = partes
+            nombre_imagen = nombre_completo.split('#')[0]
+            if nombre_imagen not in descripciones:
+                descripciones[nombre_imagen] = descripcion
+    return descripciones
+
+descripcion_imagen = cargar_descripciones("../Data/Flickr8k.token.txt")
+
 
 # ================================
 # FUNCIONES DE BÚSQUEDA
 # ================================
 
 def buscar_similares(query_vector: np.ndarray, k: int = 10):
-    print("Buscando similares en FAISS...")
     distances, indices = index.search(query_vector, k)
-    resultados = [image_names[i] for i in indices[0]]
-    print("Resultados encontrados:", resultados)
+    resultados = []
+    for idx in indices[0]:
+        imagen = str(image_names[idx])
+        descripcion = descripcion_imagen.get(imagen, "Sin descripción")
+        resultados.append({
+            "imageName": imagen,
+            "caption": descripcion
+        })
     return resultados
 
 # ================================
