@@ -14,16 +14,16 @@ function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentSearchType, setCurrentSearchType] = useState<SearchType>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const { 
-    isLoading, 
-    error, 
-    results, 
-    classifyImage, 
-    searchByText, 
-    clearResults 
+
+  const {
+    isLoading,
+    error,
+    results,
+    classifyImage,
+    searchByText,
+    clearResults
   } = useImageClassification();
-  
+
   const { searchHistory, addToHistory, clearHistory } = useSearchHistory();
 
   const handleTextSearch = async (query: string) => {
@@ -89,7 +89,7 @@ function App() {
             Busca e identifica cualquier objeto
           </h2>
           <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
-            Busca por texto o sube una imagen para identificar objetos automáticamente 
+            Busca por texto o sube una imagen para identificar objetos automáticamente
             con nuestra avanzada inteligencia artificial.
           </p>
 
@@ -139,7 +139,7 @@ function App() {
         {/* Status Messages */}
         {isLoading && (
           <div className="mb-8">
-            <LoadingSpinner 
+            <LoadingSpinner
               message={currentSearchType === 'text' ? 'Buscando...' : 'Analizando imagen...'}
               size="lg"
             />
@@ -154,6 +154,7 @@ function App() {
             />
           </div>
         )}
+
 
         {/* Results */}
         {!isLoading && !error && (results.length > 0 || currentSearchType) && (

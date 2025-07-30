@@ -2,6 +2,7 @@ import React from 'react';
 
 interface ClassificationResult {
   imageName: string;
+  caption: string
 }
 
 interface ResultsDisplayProps {
@@ -17,7 +18,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   searchType,
   isLoading,
 }) => {
-  const BASE_IMAGE_URL = 'http://localhost:8000/dataset-images/';
 
   if (isLoading) {
     return (
@@ -54,7 +54,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       </div>
     );
   }
-
   return (
     <div className="w-full max-w-6xl mx-auto">
       <div className="mb-6">
@@ -68,19 +67,25 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {results.map((result) => (
+        {results.map((result, index) => (
           <div
-            key={result.imageName}
-            className="bg-white rounded-xl shadow-lg flex flex-col items-center overflow-hidden"
+            key={result.imageName || index}
+            className="bg-white rounded-xl shadow-lg flex flex-col items-center overflow-hidden p-4"
           >
             <img
-              src={`${BASE_IMAGE_URL}${result.imageName}`}
-              alt={result.imageName}
+              src={`http://localhost:8000/dataset-images/${result.imageName}`}
+              alt={result.caption}
               className="w-48 h-48 object-cover rounded-lg shadow"
             />
-            <span className="mt-2 text-slate-700 text-xs">{result.imageName}</span>
+            <span className="mt-2 text-slate-700 text-sm font-medium">
+              {result.imageName}
+            </span>
+            <p className="mt-1 text-slate-500 text-xs text-center">
+              {result.caption}
+            </p>
           </div>
         ))}
+
       </div>
     </div>
   );
